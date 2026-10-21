@@ -1,0 +1,132 @@
+import { useState } from "react";
+
+
+function App() {
+  const [comments, setComments] = useState<string[]>([]);
+  const [count, setCount] = useState<number>(0);
+  const [videoUrl, setVideoUrl] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  function extractVideoId(url: string): string | null {
+    // 通常のURL
+    const normal = url.match(/v=([^&]+)/);
+    if (normal) return normal[1];
+
+    // 短縮URL
+    const short = url.match(/youtu\.be\/([^?]+)/);
+    if (short) return short[1];
+
+    return null;
+
+  }
+
+  const handleFetch = () => {
+    const videoId = extractVideoId(videoUrl);
+    if (!videoId) {
+      alert("URLが正しくありません");
+      return;
+    }
+
+    fetch(`http://localhost:8000/comments?video_id=${videoId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setComments(data.comments);
+        setCount(data.count);
+      });
+
+    setLoading(true); // ← ローディング開始
+
+    fetch(`http://localhost:8000/comments?video_id=${videoId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setComments(data.comments);
+        setCount(data.count);
+      })
+      .finally(() => {
+        setLoading(false); // ← ローディング終了
+      });
+  };
+
+  return (
+    <div style={{
+      maxWidth: "800px",
+      margin: "0 auto",
+      padding: "20px",
+      fontFamily: "sans-serif",
+    }}>
+      <h1>YouTube質問摘出ツール</h1>
+
+      <div style={{
+        display: "flex",
+        gap: "10px",
+        marginBottom: "20px"
+      }}>
+        <input
+          type="text"
+          placeholder="YouTube動画URLを入力"
+          value={videoUrl}
+          onChange={(e) => setVideoUrl(e.target.value)}
+          style={{ flex: 1, padding: "8px" }}
+        />
+
+        <button onClick={handleFetch}
+          style={{
+            background: "#3b82f6",
+            color: "white",
+            padding: "10px 16px",
+            border: "none",
+            borderRadius: "6px",
+            cursor: "pointer",
+            marginLeft: "10px",
+            boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+          }}
+        >
+          抽出する
+        </button>
+      </div>
+
+      {loading && <p>抽出中です…</p>}
+
+      <h1>質問コメント一覧 ({count}件)</h1>
+      <p>※無料版では戦闘20件まで表示されます</p>
+      <button
+        onClick={() => {
+          const videoId = extractVideoId(videoUrl);
+          if (!videoId) {
+            alert("URLが正しくありません");
+            return;
+          }
+          window.location.href = `http://localhost:8000/download_csv?video_id=${videoId}`;
+        }}
+      >
+        CSVダウンロード
+      </button>
+
+      <div style={{
+        maxHeight: "400px",
+        overflowY: "scroll",
+        paddingRight: "10px",
+        marginTop: "20px"
+      }}>
+        <ul>
+          {comments.slice(0, 20).map((c, i) => (
+            <li key={i} style={{
+              background: "#f9f9f9",
+              padding: "10px",
+              marginBottom: "8px",
+              borderRadius: "6px",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+              listStyle: "none"
+            }}>
+              {c}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+    </div>
+
+  );
+}
+
+export default App;
