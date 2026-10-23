@@ -6,6 +6,8 @@ function App() {
   const [count, setCount] = useState<number>(0);
   const [videoUrl, setVideoUrl] = useState("");
   const [loading, setLoading] = useState(false);
+  const [mode, setMode] = useState("question"); // 初期値は質問
+
 
   function extractVideoId(url: string): string | null {
     // 通常のURL
@@ -20,31 +22,32 @@ function App() {
 
   }
 
-  const handleFetch = () => {
+  const handleFetch = async () => {
     const videoId = extractVideoId(videoUrl);
     if (!videoId) {
       alert("URLが正しくありません");
       return;
     }
 
-    fetch(`http://localhost:8000/comments?video_id=${videoId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setComments(data.comments);
-        setCount(data.count);
-      });
-
     setLoading(true); // ← ローディング開始
 
-    fetch(`http://localhost:8000/comments?video_id=${videoId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setComments(data.comments);
-        setCount(data.count);
-      })
-      .finally(() => {
-        setLoading(false); // ← ローディング終了
+    try {
+      const res = await fetch("http://localhost:8000/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          videoId: videoId,
+          mode: mode, // ← UIで選んだ抽出モード
+        }),
       });
+
+      const data = await res.json();
+
+      setComments(data.comments);
+      setCount(data.count);
+    } finally {
+      setLoading(false); // ← ローディング終了
+    }
   };
 
   return (
@@ -86,6 +89,15 @@ function App() {
       </div>
 
       {loading && <p>抽出中です…</p>}
+
+      <select value={mode} onChange={(e) => setMode(e.target.value)}>
+        <option value="question">質問</option>
+        <option value="surprise">驚き</option>
+        <option value="positive">肯定</option>
+        <option value="negative">否定</option>
+        <option value="all">すべて</option>
+      </select>
+
 
       <h1>質問コメント一覧 ({count}件)</h1>
       <p>※無料版では戦闘20件まで表示されます</p>
