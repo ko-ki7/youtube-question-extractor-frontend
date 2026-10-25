@@ -2,6 +2,7 @@ import { useState } from "react";
 
 
 function App() {
+  const API_URL = import.meta.env.VITE_API_URL;
   const [comments, setComments] = useState<string[]>([]);
   const [count, setCount] = useState<number>(0);
   const [videoUrl, setVideoUrl] = useState("");
@@ -32,7 +33,7 @@ function App() {
     setLoading(true); // ← ローディング開始
 
     try {
-      const res = await fetch("http://localhost:8000/comments", {
+      const res = await fetch(`${API_URL}/comments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -69,7 +70,10 @@ function App() {
           placeholder="YouTube動画URLを入力"
           value={videoUrl}
           onChange={(e) => setVideoUrl(e.target.value)}
-          style={{ flex: 1, padding: "8px" }}
+          style={{ flex: 1,
+                   padding: "8px",
+                   borderRadius: "6px"
+          }}
         />
 
         <button onClick={handleFetch}
@@ -90,7 +94,9 @@ function App() {
 
       {loading && <p>抽出中です…</p>}
 
-      <select value={mode} onChange={(e) => setMode(e.target.value)}>
+      <select
+      className="mode-select"
+      value={mode} onChange={(e) => setMode(e.target.value)}>
         <option value="question">質問</option>
         <option value="surprise">驚き</option>
         <option value="positive">肯定</option>
@@ -100,8 +106,9 @@ function App() {
 
 
       <h1>質問コメント一覧 ({count}件)</h1>
-      <p>※無料版では戦闘20件まで表示されます</p>
+      <p>※無料版では先頭から20件まで表示されます</p> 
       <button
+        className="download-button"
         onClick={() => {
           const videoId = extractVideoId(videoUrl);
           if (!videoId) {
@@ -121,9 +128,10 @@ function App() {
         marginTop: "20px"
       }}>
         <ul>
-          {comments.slice(0, 20).map((c, i) => (
+          {comments.slice().map((c, i) => (
             <li key={i} style={{
-              background: "#f9f9f9",
+              background: "rgba(255, 255, 255, 0.2)",
+              color: "#fff",
               padding: "10px",
               marginBottom: "8px",
               borderRadius: "6px",

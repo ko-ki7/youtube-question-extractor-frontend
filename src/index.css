@@ -64,6 +64,13 @@
 
 body {
   margin: 0;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  background: linear-gradient(135deg, #8fc9a3, #6bb58d);
+  background-size: cover;
+  color: #ffffff;
+  font-family: 'Noto Sans JP', sans-serif;
 }
 
 h1,
@@ -93,6 +100,27 @@ h2 {
 }
 p {
   margin: 0;
+}
+
+
+.mode-select {
+  font-size: 16px;        /* 文字を大きく */
+  padding: 10px 14px;     /* 内側の余白を増やす */
+  border-radius: 8px;     /* 角を丸くして柔らかく */
+  border: 1px solid #ccc; 
+  background-color: #fff; 
+  cursor: pointer;        
+}
+
+.download-button {
+  font-size: 16px;        /* 文字を大きく */
+  padding: 10px 20px;     /* 内側の余白を増やす */
+  border-radius: 8px;     
+  border: none;
+  background-color: #6bb58d; /* 背景色を設定 */
+  color: #fff;            /* 文字色を白に */
+  cursor: pointer;        /* カーソルをポインターに */
+  transition: background-color 0.3s ease; /* ホバー時の変化を滑らかに */
 }
 
 code,
