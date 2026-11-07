@@ -4,7 +4,6 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 
 function App() {
-  const API_URL = "https://youtube-question-extractor-backend-production.up.railway.app";
   const [comments, setComments] = useState<string[]>([]);
   const [count, setCount] = useState<number>(0);
   const [videoUrl, setVideoUrl] = useState("");
@@ -84,7 +83,7 @@ function App() {
     setLoading(true); // ← ローディング開始
 
     try {
-      const res = await fetch(`${API_URL}/comments`, {
+      const res = await fetch(`https://youtube-question-extractor-backend-production.up.railway.app/comments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
