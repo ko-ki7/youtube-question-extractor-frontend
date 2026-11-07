@@ -44,8 +44,8 @@ function App() {
     if (success === "true" && userId) {
       fetch(`https://youtube-question-extractor-backend-production.up.railway.app/payment-success?user_id=${userId}`)
         .then(res => res.json())
-        .then(data => {
-          alert("Proプランの支払いが完了しました！");
+        .then(() => {
+          alert("Proプランの支払いが完了しました!");
           window.history.replaceState({}, document.title, window.location.pathname);
           checkProStatus(); // Pro状態を再確認
         })
