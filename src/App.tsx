@@ -1,5 +1,7 @@
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
+import PricingPage from "./pages/PricingPage";
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 
 function App() {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -8,7 +10,56 @@ function App() {
   const [videoUrl, setVideoUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState("question"); // 初期値は質問
+  const [showPricingModal, setShowPricingModal] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [isPro, setIsPro] = useState(false);
 
+  // Pro状態を確認する関数
+  const checkProStatus = async () => {
+    const userIdStr = localStorage.getItem("user_id");
+    if (!userIdStr) {
+      setIsPro(false);
+      return;
+    }
+    try {
+      const res = await fetch(`http://localhost:8000/is-pro/${userIdStr}`);
+      const data = await res.json();
+      setIsPro(data.is_pro);
+    } catch {
+      setIsPro(false);
+    }
+  };
+
+  // コンポーネント読み込み時に実行
+  useEffect(() => {
+    // Pro状態を確認
+    checkProStatus();
+
+    // 決済成功・キャンセルの処理
+    const params = new URLSearchParams(window.location.search);
+    const success = params.get("success");
+    const userId = params.get("user_id");
+
+    if (success === "true" && userId) {
+      fetch(`http://localhost:8000/payment-success?user_id=${userId}`)
+        .then(res => res.json())
+        .then(data => {
+          alert("Proプランの支払いが完了しました！");
+          window.history.replaceState({}, document.title, window.location.pathname);
+          checkProStatus(); // Pro状態を再確認
+        })
+        .catch(err => {
+          console.error(err);
+          alert("決済は完了しましたが、プランの反映に失敗しました");
+        });
+    }
+
+    if (params.get("canceled") === "true") {
+      alert("決済がキャンセルされました");
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
 
   function extractVideoId(url: string): string | null {
     // 通常のURL
@@ -58,7 +109,73 @@ function App() {
       padding: "20px",
       fontFamily: "sans-serif",
     }}>
-      <h1>YouTube質問摘出ツール</h1>
+      {/* ヘッダー */}
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: "20px"
+      }}>
+        <h1 style={{ margin: 0 }}>YouTube質問摘出ツール</h1>
+
+        <div>
+          {localStorage.getItem("user_id") ? (
+            // ログイン済みの場合
+            <button
+              onClick={() => {
+                localStorage.removeItem("user_id");
+                setIsPro(false);
+                alert("ログアウトしました");
+                window.location.reload();
+              }}
+              style={{
+                background: "#64748b",
+                color: "white",
+                padding: "8px 16px",
+                border: "none",
+                borderRadius: "6px",
+                cursor: "pointer",
+                marginLeft: "8px",
+              }}
+            >
+              ログアウト
+            </button>
+          ) : (
+            // 未ログインの場合
+            <>
+              <button
+                onClick={() => setShowLoginModal(true)}
+                style={{
+                  background: "#334155",
+                  color: "white",
+                  padding: "8px 16px",
+                  border: "none",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                  marginLeft: "8px",
+                }}
+              >
+                ログイン
+              </button>
+              <button
+                onClick={() => setShowRegisterModal(true)}
+                style={{
+                  background: "#2563eb",
+                  color: "white",
+                  padding: "8px 16px",
+                  border: "none",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                  marginLeft: "8px",
+                }}
+              >
+                新規登録
+              </button>
+            </>
+          )}
+        </div>
+
+      </div>
 
       <div style={{
         display: "flex",
@@ -70,9 +187,10 @@ function App() {
           placeholder="YouTube動画URLを入力"
           value={videoUrl}
           onChange={(e) => setVideoUrl(e.target.value)}
-          style={{ flex: 1,
-                   padding: "8px",
-                   borderRadius: "6px"
+          style={{
+            flex: 1,
+            padding: "8px",
+            borderRadius: "6px"
           }}
         />
 
@@ -95,8 +213,8 @@ function App() {
       {loading && <p>抽出中です…</p>}
 
       <select
-      className="mode-select"
-      value={mode} onChange={(e) => setMode(e.target.value)}>
+        className="mode-select"
+        value={mode} onChange={(e) => setMode(e.target.value)}>
         <option value="question">質問</option>
         <option value="surprise">驚き</option>
         <option value="positive">肯定</option>
@@ -106,16 +224,43 @@ function App() {
 
 
       <h1>質問コメント一覧 ({count}件)</h1>
-      <p>※無料版では先頭から20件まで表示されます</p> 
+      <p>{isPro
+        ? "Proプラン：最大1000件まで表示"
+        : "※無料版では先頭から20件まで表示されます"}
+      </p>
       <button
         className="download-button"
-        onClick={() => {
-          const videoId = extractVideoId(videoUrl);
-          if (!videoId) {
-            alert("URLが正しくありません");
+        onClick={async () => {
+          const userIdStr = localStorage.getItem("user_id");
+          if (!userIdStr) {
+            alert("ログインしてください");
+            setShowLoginModal(true);
             return;
           }
-          window.location.href = `http://localhost:8000/download_csv?video_id=${videoId}`;
+
+          const userId = parseInt(userIdStr);
+
+          // Proかどうかを確認
+          try {
+            const res = await fetch(`http://localhost:8000/is-pro/${userId}`);
+            const data = await res.json();
+
+            if (data.is_pro) {
+              // Proユーザー → ダウンロード実行
+              const videoId = extractVideoId(videoUrl);
+              if (!videoId) {
+                alert("URLが正しくありません");
+                return;
+              }
+              window.location.href = `http://localhost:8000/download_csv?video_id=${videoId}`;
+            } else {
+              // 無料ユーザー → 料金プランを表示
+              setShowPricingModal(true);
+            }
+          } catch (error) {
+            console.error(error);
+            alert("エラーが発生しました");
+          }
         }}
       >
         CSVダウンロード
@@ -128,7 +273,7 @@ function App() {
         marginTop: "20px"
       }}>
         <ul>
-          {comments.slice().map((c, i) => (
+          {comments.slice(0, isPro ? 1000 : 20).map((c, i) => (
             <li key={i} style={{
               background: "rgba(255, 255, 255, 0.2)",
               color: "#fff",
@@ -143,9 +288,18 @@ function App() {
           ))}
         </ul>
       </div>
+      {showPricingModal && <PricingPage
+        onClose={() => setShowPricingModal(false)}
+      />}
+      {/* ログインモーダルを追加 */}
+      {showLoginModal && (
+        <LoginPage onClose={() => setShowLoginModal(false)} />
+      )}
 
+      {showRegisterModal && (
+        <RegisterPage onClose={() => setShowRegisterModal(false)} />
+      )}
     </div>
-
   );
 }
 
