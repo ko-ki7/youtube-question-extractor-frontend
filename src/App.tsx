@@ -42,7 +42,7 @@ function App() {
     const userId = params.get("user_id");
 
     if (success === "true" && userId) {
-      fetch(`http://localhost:8000/payment-success?user_id=${userId}`)
+      fetch(`https://youtube-question-extractor-backend-production.up.railway.app/payment-success?user_id=${userId}`)
         .then(res => res.json())
         .then(data => {
           alert("Proプランの支払いが完了しました！");
@@ -242,7 +242,7 @@ function App() {
 
           // Proかどうかを確認
           try {
-            const res = await fetch(`http://localhost:8000/is-pro/${userId}`);
+            const res = await fetch(`https://youtube-question-extractor-backend-production.up.railway.app/is-pro/${userId}`);
             const data = await res.json();
 
             if (data.is_pro) {
@@ -252,7 +252,7 @@ function App() {
                 alert("URLが正しくありません");
                 return;
               }
-              window.location.href = `http://localhost:8000/download_csv?video_id=${videoId}`;
+              window.location.href = `https://youtube-question-extractor-backend-production.up.railway.app/download_csv?video_id=${videoId}`;
             } else {
               // 無料ユーザー → 料金プランを表示
               setShowPricingModal(true);
