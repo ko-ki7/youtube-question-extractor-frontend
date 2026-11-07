@@ -216,10 +216,10 @@ function App() {
         className="mode-select"
         value={mode} onChange={(e) => setMode(e.target.value)}>
         <option value="question">質問</option>
-        <option value="surprise">驚き</option>
-        <option value="positive">肯定</option>
-        <option value="negative">否定</option>
-        <option value="all">すべて</option>
+        {/* <option value="surprise">驚き</option> */}
+        {/* <option value="positive">肯定</option> */}
+        {/* <option value="negative">否定</option> */}
+        {/* <option value="all">すべて</option> */}
       </select>
 
 
