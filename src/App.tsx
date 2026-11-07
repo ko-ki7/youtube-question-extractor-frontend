@@ -23,7 +23,7 @@ function App() {
       return;
     }
     try {
-      const res = await fetch(`http://localhost:8000/is-pro/${userIdStr}`);
+      const res = await fetch(`youtube-question-extractor-backend-production.up.railway.app/is-pro/${userIdStr}`);
       const data = await res.json();
       setIsPro(data.is_pro);
     } catch {
