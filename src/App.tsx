@@ -83,7 +83,8 @@ function App() {
     setLoading(true); // ← ローディング開始
 
     try {
-      const res = await fetch(`https://youtube-question-extractor-backend-production.up.railway.app/comments`, {
+      const userId = localStorage.getItem("user_id");
+      const res = await fetch(`https://youtube-question-extractor-backend-production.up.railway.app/comments?user_id=${userId || ''}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
