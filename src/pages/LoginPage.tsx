@@ -27,14 +27,14 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
 
             const data = await response.json();
 
-            if (response.ok) {
-                // ログイン成功 → user_id を保存
+            if (data.user_id) {
                 localStorage.setItem('user_id', data.user_id.toString());
                 alert('ログイン成功');
                 onLoginSuccess?.();
                 onClose();
             } else {
-                alert(data.error || 'ログインに失敗しました');
+                alert('ログインは成功しましたが、ユーザーIDの取得に失敗しました');
+                console.error('返ってきたデータ:', data);
             }
         } catch (error) {
             console.error(error);
