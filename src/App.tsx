@@ -84,7 +84,14 @@ function App() {
 
     try {
       const userId = localStorage.getItem("user_id");
-      const url = `https://youtube-question-extractor-backend-production.up.railway.app/comments?user_id=${userId || ""}`;
+
+      // user_id があるときだけパラメータに付ける
+      const params = new URLSearchParams();
+      if (userId) {
+        params.append("user_id", userId);
+      }
+
+      const url = `https://youtube-question-extractor-backend-production.up.railway.app/comments?${params.toString()}`;
 
       const res = await fetch(url, {
         method: "POST",
