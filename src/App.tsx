@@ -84,21 +84,34 @@ function App() {
 
     try {
       const userId = localStorage.getItem("user_id");
-      const res = await fetch(`https://youtube-question-extractor-backend-production.up.railway.app/comments?user_id=${userId || ''}`, {
+      const url = `https://youtube-question-extractor-backend-production.up.railway.app/comments?user_id=${userId || ""}`;
+
+      const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          videoId: videoId,
-          mode: mode, // ← UIで選んだ抽出モード
+          videoId,
+          mode,
         }),
       });
 
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        console.error("API Error:", errorData);
+        alert("コメントの取得に失敗しました。しばらくしてから再度お試しください。");
+        return;
+      }
+
       const data = await res.json();
 
-      setComments(data.comments);
-      setCount(data.count);
+      // 安全にセット
+      setComments(Array.isArray(data.comments) ? data.comments : []);
+      setCount(typeof data.count === "number" ? data.count : 0);
+    } catch (error) {
+      console.error(error);
+      alert("通信エラーが発生しました");
     } finally {
-      setLoading(false); // ← ローディング終了
+      setLoading(false);
     }
   };
 
@@ -116,7 +129,7 @@ function App() {
         alignItems: "center",
         marginBottom: "20px"
       }}>
-        <h1 style={{ margin: 0 }}>YouTube質問摘出ツール</h1>
+        <h1 style={{ margin: 0 }}>YouTube質問抽出ツール</h1>
 
         <div>
           {localStorage.getItem("user_id") ? (
