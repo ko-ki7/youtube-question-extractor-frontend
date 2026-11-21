@@ -4,6 +4,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 
 function App() {
+  const API_BASE_URL = import.meta.env.VITE_API_URL || "https://youtube-question-extractor-backend-production.up.railway.app";
   const [comments, setComments] = useState<string[]>([]);
   const [count, setCount] = useState<number>(0);
   const [videoUrl, setVideoUrl] = useState("");
@@ -22,7 +23,7 @@ function App() {
       return;
     }
     try {
-      const res = await fetch(`https://youtube-question-extractor-backend-production.up.railway.app/is-pro/${userIdStr}`);
+      const res = await fetch(`${API_BASE_URL}/is-pro/${userIdStr}`);
       const data = await res.json();
       setIsPro(data.is_pro);
     } catch {
@@ -41,7 +42,7 @@ function App() {
     const userId = params.get("user_id");
 
     if (success === "true" && userId) {
-      fetch(`https://youtube-question-extractor-backend-production.up.railway.app/payment-success?user_id=${userId}`)
+      fetch(`${API_BASE_URL}/payment-success?user_id=${userId}`)
         .then(res => res.json())
         .then(() => {
           alert("Proプランの支払いが完了しました!");
