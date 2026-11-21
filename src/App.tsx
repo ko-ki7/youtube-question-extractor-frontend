@@ -5,6 +5,7 @@ import RegisterPage from './pages/RegisterPage';
 
 function App() {
   const API_BASE_URL = import.meta.env.VITE_API_URL || "https://youtube-question-extractor-backend-production.up.railway.app";
+  console.log("API_BASE_URL =", API_BASE_URL);
   const [comments, setComments] = useState<string[]>([]);
   const [count, setCount] = useState<number>(0);
   const [videoUrl, setVideoUrl] = useState("");
