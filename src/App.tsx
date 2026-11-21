@@ -92,7 +92,7 @@ function App() {
         params.append("user_id", userId);
       }
 
-      const url = `https://youtube-question-extractor-backend-production.up.railway.app/comments?${params.toString()}`;
+      const url = `${API_BASE_URL}/comments?${params.toString()}`;
 
       const res = await fetch(url, {
         method: "POST",
@@ -263,7 +263,7 @@ function App() {
 
           // Proかどうかを確認
           try {
-            const res = await fetch(`https://youtube-question-extractor-backend-production.up.railway.app/is-pro/${userId}`);
+            const res = await fetch(`${API_BASE_URL}/is-pro/${userId}`);
             const data = await res.json();
 
             if (data.is_pro) {
@@ -273,7 +273,7 @@ function App() {
                 alert("URLが正しくありません");
                 return;
               }
-              window.location.href = `https://youtube-question-extractor-backend-production.up.railway.app/download_csv?video_id=${videoId}`;
+              window.location.href = `${API_BASE_URL}/download_csv?video_id=${videoId}`;
             } else {
               // 無料ユーザー → 料金プランを表示
               setShowPricingModal(true);
