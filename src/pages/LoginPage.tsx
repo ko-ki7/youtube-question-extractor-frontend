@@ -105,18 +105,19 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
                     />
                 </div>
 
-                <div style={{ marginBottom: '24px' }}>
+                <div style={{ marginBottom: '24px', position: 'relative' }}>
                     <input
-                        type="password"
+                        type={showPassword ? 'text' : 'password'}
                         placeholder="パスワード"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         style={{
                             width: '100%',
-                            padding: '12px',
+                            padding: '12px 44px 12px 12px', 
                             borderRadius: '8px',
                             border: '1px solid #cbd5e1',
                             fontSize: '16px',
+                            boxSizing: 'border-box',
                         }}
                     />
                     <button
@@ -124,14 +125,15 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
                         onClick={() => setShowPassword((prev) => !prev)}
                         style={{
                             position: 'absolute',
-                            right: '10px',
+                            right: '12px',
                             top: '50%',
                             transform: 'translateY(-50%)',
                             background: 'none',
                             border: 'none',
                             cursor: 'pointer',
                             fontSize: '18px',
-                            padding: '4px',
+                            padding: 0,
+                            lineHeight: 1,
                         }}
                         aria-label={showPassword ? 'パスワードを隠す' : 'パスワードを表示'}
                     >
