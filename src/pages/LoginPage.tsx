@@ -10,6 +10,7 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleLogin = async () => {
         if (!email || !password) {
@@ -19,7 +20,7 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
 
         setLoading(true);
         try {
-            const response = await fetch('https://youtube-question-extractor-backend-production.up.railway.app/login', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }),
@@ -118,6 +119,24 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
                             fontSize: '16px',
                         }}
                     />
+                    <button
+                        type="button"
+                        onClick={() => setShowPassword((prev) => !prev)}
+                        style={{
+                            position: 'absolute',
+                            right: '10px',
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            fontSize: '18px',
+                            padding: '4px',
+                        }}
+                        aria-label={showPassword ? 'パスワードを隠す' : 'パスワードを表示'}
+                    >
+                        {showPassword ? '🙈' : '👁️'}
+                    </button>
                 </div>
 
                 <button
