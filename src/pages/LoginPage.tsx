@@ -97,7 +97,7 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
                         onChange={(e) => setEmail(e.target.value)}
                         style={{
                             width: '100%',
-                            padding: '12px',
+                            padding: '12px 44px 12px 12px',
                             borderRadius: '8px',
                             border: '1px solid #cbd5e1',
                             fontSize: '16px',
